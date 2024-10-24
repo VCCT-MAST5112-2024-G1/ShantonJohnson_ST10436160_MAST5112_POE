@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, Keyboard } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, Keyboard, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Picker } from '@react-native-picker/picker';
 
@@ -14,10 +14,13 @@ export default function AddMenuItemScreen({ route, navigation }: { route: any; n
   const { menuItems, setMenuItems } = route.params;
 
   // States for handling form input values
-  const [name, setName] = useState<string>('');             // Dish name
-  const [description, setDescription] = useState('');        // Dish description
-  const [course, setCourse] = useState<string>('starter');   // Dish course, defaults to 'starter'
-  const [price, setPrice] = useState<string>('');            // Dish price as a string for input handling
+  const [name, setName] = useState<string>('');             
+  const [description, setDescription] = useState('');        
+  const [course, setCourse] = useState<string>('starter');   
+  const [price, setPrice] = useState<string>('');            
+
+  // Animation for the Add Dish button
+  const [scale] = useState(new Animated.Value(1));
 
   // Function to handle adding a new item
   const handleAddItem = () => {
@@ -34,12 +37,31 @@ export default function AddMenuItemScreen({ route, navigation }: { route: any; n
       setDescription('');
       setCourse('starter');
       setPrice('');
+
+      // Custom success alert with a toast-style approach
       Alert.alert('Success', 'Dish added successfully!');
       Keyboard.dismiss();
       navigation.goBack();
     } else {
       Alert.alert('Error', 'Please fill in all fields and ensure the price is a positive number.');
     }
+  };
+
+  // Animation on button press
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.9,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
   };
 
   return (
@@ -83,9 +105,16 @@ export default function AddMenuItemScreen({ route, navigation }: { route: any; n
         />
       </View>
 
-      <TouchableOpacity style={styles.greenButton} onPress={handleAddItem}>
-        <Text style={styles.buttonText}>Add Dish</Text>
-      </TouchableOpacity>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <TouchableOpacity
+          style={styles.greenButton}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={handleAddItem}
+        >
+          <Text style={styles.buttonText}>Add Dish</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
       <StatusBar style="light" />
     </View>
@@ -106,6 +135,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: 'white',
   },
+  inputContainer: {
+    borderColor: 'white',
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 20,
+    width: '90%',
+    alignItems: 'center',
+  },
   input: {
     height: 40,
     borderColor: 'white',
@@ -116,14 +153,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#333',
     color: 'white',
-  },
-  inputContainer: {
-    borderColor: 'white',
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 20,
-    width: '90%',
-    alignItems: 'center',
   },
   pickerContainer: {
     height: 40,
@@ -143,10 +172,11 @@ const styles = StyleSheet.create({
   greenButton: {
     backgroundColor: 'green',
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 30, // Rounded corners for a more modern button
     width: '80%',
     alignItems: 'center',
     marginBottom: 20,
+    elevation: 5, // Shadow for a raised effect
   },
   buttonText: {
     color: 'white',
