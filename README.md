@@ -10,11 +10,11 @@ Mobile App Scripting
 
 MAST5112
 
-POE-Part 2
+POE-Part 3
 
-8 October 2024
+22 November 2024
 
-Video demonstration: https://youtu.be/GnvI4nkXF3Y
+Video demonstration: 
 
 
 
